@@ -29,17 +29,10 @@
 #include "IRService.h"
 
 // ==================== start of TUNEABLE PARAMETERS ====================
-// An IR detector/demodulator is connected to GPIO pin 5
+// An IR detector/demodulator is connected to GPIO pin 2
 // e.g. D5 on a NodeMCU board.
 // Note: GPIO 16 won't work on the ESP8266 as it does not have interrupts.
-const uint16_t kRecvPin = 5;
-
-// The Serial connection baud rate.
-// i.e. Status message will be sent to the PC at this baud rate.
-// Try to avoid slow speeds like 9600, as you will miss messages and
-// cause other problems. 115200 (or faster) is recommended.
-// NOTE: Make sure you set your Serial Monitor to the same speed.
-const uint32_t kBaudRate = 115200;
+const uint16_t kRecvPin = 2;
 
 // As this program is a special purpose capture/decoder, let us use a larger
 // than normal buffer so we can handle Air Conditioner remote codes.
@@ -115,21 +108,14 @@ const uint8_t kTolerancePercentage = kTolerance;  // kTolerance is normally 25%
 IRrecv irrecv(kRecvPin, kCaptureBufferSize, kTimeout, true);
 decode_results results;  // Somewhere to store the results
 
-const int RED_LED_PIN = 4;
+// const int RED_LED_PIN = 4;
 
 
 
 // This section of code runs only once at start-up.
 void IR_init() {
-    pinMode(RED_LED_PIN, OUTPUT);
+  //pinMode(RED_LED_PIN, OUTPUT);
 
-#if defined(ESP8266)
-  Serial.begin(kBaudRate, SERIAL_8N1, SERIAL_TX_ONLY);
-#else  // ESP8266
-  Serial.begin(kBaudRate, SERIAL_8N1);
-#endif  // ESP8266
-  while (!Serial)  // Wait for the serial connection to be establised.
-    delay(50);
   // Perform a low level sanity checks that the compiler performs bit field
   // packing as we expect and Endianness is as we expect.
   assert(irutils::lowLevelSanityCheck() == 0);
@@ -144,7 +130,7 @@ void IR_init() {
 }
 
 
-bool isRedOn = false;
+// bool isRedOn = false;
 
 
 // The repeating section of the code
@@ -154,15 +140,15 @@ void IR_read() {
 
     Serial.printf("It is: 0x%08x\n", results.value);  // gives 0x00000007
 
-    if (results.value == 0xFFB04F) {          //  Key '4' is pressed which belongs to the red LED
-      if (isRedOn == true) {                  //  Red LED is on, turn it off and set update corresponding state variable
-        digitalWrite(RED_LED_PIN, LOW);
-        isRedOn = false;
-      } else {                                //  Red LED is off, turn it on and set update corresponding state variable
-        digitalWrite(RED_LED_PIN, HIGH);
-        isRedOn = true;
-      }
-    }
+    // if (results.value == 0xFFB04F) {          //  Key '4' is pressed which belongs to the red LED
+    //   if (isRedOn == true) {                  //  Red LED is on, turn it off and set update corresponding state variable
+    //     digitalWrite(RED_LED_PIN, LOW);
+    //     isRedOn = false;
+    //   } else {                                //  Red LED is off, turn it on and set update corresponding state variable
+    //     digitalWrite(RED_LED_PIN, HIGH);
+    //     isRedOn = true;
+    //   }
+    // }
     
     // Display a crude timestamp.
     uint32_t now = millis();
